@@ -8,6 +8,7 @@ class Dashboard extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model('Models_mahasiswa');
+        $this->load->model('M_user');
 		cek_login();
 	}
 
@@ -67,10 +68,12 @@ class Dashboard extends CI_Controller
         
         $data = [
             'title' => 'Dashboard Petugas',
-            
+            'mhs'       => count($this->Models_mahasiswa->getData()->result()),
+            'ruangan' => $this->M_user->cekuser($this->session->userdata('username'))->row()->ruangan ?? 'Tidak Tersedia',
+            'registed'  => count($this->Models_mahasiswa->getDataMhsRegist()->result()),
         ];
         $this->load->view('layout/header', $data);
-        $this->load->view('layout/sidebar_petugas', $data);
+        $this->load->view('layout/sidebar', $data);
         $this->load->view('layout/navbar');
         $this->load->view('content/petugas/dashboard/index', $data); 
         $this->load->view('layout/footer');

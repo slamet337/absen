@@ -3,8 +3,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class M_user extends CI_Model
 {
-
-	// Get User by useername
 	function cekuser($username){
 		$this->db->where('username', $username);
 		$query = $this->db->get('user');

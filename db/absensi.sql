@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 12, 2025 at 08:47 AM
+-- Generation Time: Jul 12, 2025 at 09:27 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -68,6 +68,7 @@ CREATE TABLE `user` (
   `namauser` varchar(30) NOT NULL,
   `status` varchar(1) NOT NULL,
   `role` varchar(1) NOT NULL,
+  `ruangan` varchar(15) NOT NULL,
   `created_at` varchar(36) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -75,9 +76,9 @@ CREATE TABLE `user` (
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`iduser`, `username`, `password`, `namauser`, `status`, `role`, `created_at`) VALUES
-('85fa70fa-a6b9-11ed-bc36-c01850377eb8', 'admin', 'admin', 'Agrhi', '1', '1', ''),
-('db051ff2-5e3c-11f0-b92d-68f728843a5b', 'GZHZ', 'memed', ';petugas', '1', '2', '');
+INSERT INTO `user` (`iduser`, `username`, `password`, `namauser`, `status`, `role`, `ruangan`, `created_at`) VALUES
+('85fa70fa-a6b9-11ed-bc36-c01850377eb8', 'admin', 'admin', 'Agrhi', '1', '1', '', ''),
+('db051ff2-5e3c-11f0-b92d-68f728843a5b', 'GZHZ', 'memed', 'petugas', '1', '2', 'GZHZ', '');
 
 --
 -- Indexes for dumped tables
