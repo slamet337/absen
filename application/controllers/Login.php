@@ -6,76 +6,84 @@ class Login extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('M_user');
+        $this->load->model('M_user');              
+        $this->load->model('Models_mahasiswa'); 
+           
     }
 
-    // Load View Login
+    // Halaman Login Gabungan
     public function index()
     {
         $data = [
-            'title' => 'Login',
+            'title' => 'Login Sistem',
         ];
         $this->load->view('content/login/layout/header', $data);
-        $this->load->view('content/login/index');
+        $this->load->view('content/login/index'); 
         $this->load->view('content/login/layout/footer');
     }
 
-    // Load View Register
-    public function regist()
-    {
-        $data = [
-            'title' => 'Registrasi',
-        ];
-        $this->load->view('content/login/layout/header', $data);
-        $this->load->view('content/login/regist');
-        $this->load->view('content/login/layout/footer');
-    }
-
-    // Proses Login
     public function prosses()
-    {
-        $username   = htmlspecialchars($this->input->post('username'));
-        $password   = htmlspecialchars($this->input->post('password'));
-        
-        $cekuser = $this->M_user->cekuser($username)->result();
-        if ($cekuser) {
-            
-            $ceklogin = $this->M_user->ceklogin($username, $password)->row();
-            // print_r($ceklogin); die;
+{
+    $username = htmlspecialchars($this->input->post('username'));
+    $password = htmlspecialchars($this->input->post('password'));
 
-            if ($ceklogin) {
+    // Cek Admin
+    $admin = $this->M_user->cekuser($username)->row();
 
-                    if ($ceklogin->status == 1) {
-                        $this->session->set_userdata('namauser', $ceklogin->namauser);
-                        $this->session->set_userdata('role', $ceklogin->role);
-                        redirect('dashboard');
-                    } else {
-                        $this->session->set_flashdata('swetalert', '`Upsss!`, `Maaf User Anda Belum Aktif`, `error`');
-                        redirect('login');
-                    }
+    if ($admin) {
+        if ($admin->password === $password) {
+            if ($admin->status == 1) {
+                $this->session->set_userdata([
+                    'namauser' => $admin->namauser,
+                    'role'     => 'admin',
+                    'is_login' => true
+                ]);
+                redirect('dashboard');
             } else {
-                // echo 'gagal login'; die;
-                $this->session->set_flashdata('swetalert', '`Upsss!`, `Maaf Username dan Password Anda Salah`, `error`');
-                // print_r($this->session->flashdata('swetalert')); die;
+                $this->session->set_flashdata('swetalert', '`Upsss!`, `Akun admin belum aktif`, `error`');
                 redirect('login');
             }
         } else {
-            $this->session->set_flashdata('swetalert', '`Upsss!`, `Maaf User Anda Belum Terdaftar`, `error`');
+            $this->session->set_flashdata('swetalert', '`Upsss!`, `Password salah`, `error`');
             redirect('login');
         }
     }
+    
+$mhs = $this->Models_mahasiswa->getMahasiswaByNIM($username)->row();
+    // if ($mhs) {
+    //     echo '<pre>';
+    //     print_r($mhs);
+    //     echo '</pre>';
+    //     exit;
+    // }
+if ($mhs) {
+    if (password_verify($password, $mhs->password)) {
+        if ($mhs->status == '1') {
+            $this->session->set_userdata([
+                'nim'      => $mhs->nim,
+                'nama'     => $mhs->nama,
+                'role'     => 'mahasiswa',
+                'is_login' => true
+            ]);
+            redirect('dashboard');
+        } else {
+            $this->session->set_flashdata('swetalert', '`Upsss!`, `Akun mahasiswa belum aktif`, `error`');
+            redirect('login');
+        }
+    } else {
+        $this->session->set_flashdata('swetalert', '`Upsss!`, `Password salah`, `error`');
+        redirect('login');
+         }
+     }
+    }
 
-    // Proses Logout
     public function logout()
     {
-        $this->session->unset_userdata('nameuser');
-        $this->session->unset_userdata('role');
-
-        $this->session->set_flashdata('swetalert', '`Good job!`, `Abda Berhasil Logout`, `success`');
+        $this->session->sess_destroy();
+        $this->session->set_flashdata('swetalert', '`Good job!`, `Berhasil Logout`, `success`');
         redirect('login');
     }
 
-    // Load View Blocked
     public function blocked()
     {
         $this->load->view('content/login/blocked');
