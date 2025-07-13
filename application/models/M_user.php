@@ -8,7 +8,6 @@ class M_user extends CI_Model
 		$query = $this->db->get('user');
 		return $query;
 	}
-
 	// Get User by useername and password
 	public function ceklogin($username, $password){
 		$this->db->where('username', $username);
