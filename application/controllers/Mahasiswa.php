@@ -53,41 +53,71 @@ class Mahasiswa extends CI_Controller
         $this->load->view('content/mahasiswa/profil', $data);
         $this->load->view('layout/footer');
     }
-public function uploadPdf()
+public function uploadBerkas()
 {
     if ($this->session->userdata('role') != 'mahasiswa') {
         redirect('login/blocked');
     }
 
     $nim = $this->session->userdata('nim');
-    // $upload_path = FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'pdf';
-$upload_path = FCPATH . 'uploads/pdf/';
+
+    $upload_path_gambar = './uploads/gambar/';
+    $upload_path_pdf = './uploads/pdf/';
 
     // Buat folder jika belum ada
-    if (!is_dir($upload_path)) {
-        mkdir($upload_path, 0777, true);
+    if (!is_dir($upload_path_gambar)) mkdir($upload_path_gambar, 0755, true);
+    if (!is_dir($upload_path_pdf)) mkdir($upload_path_pdf, 0755, true);
+
+    $this->load->library('upload');
+
+    // === UPLOAD GAMBAR ===
+    $foto = null;
+    if (!empty($_FILES['file_gambar']['name'])) {
+        $config_gambar = [
+            'upload_path'   => $upload_path_gambar,
+            'allowed_types' => 'jpg|jpeg|png|gif',
+            'max_size'      => 2048,
+            'file_name'     => 'foto_' . $nim . '_' . time()
+        ];
+        $this->upload->initialize($config_gambar);
+
+        if ($this->upload->do_upload('file_gambar')) {
+            $foto = $this->upload->data('file_name');
+        } else {
+            $this->session->set_flashdata('swetalert', "`Gagal Upload Foto`, `" . strip_tags($this->upload->display_errors()) . "`, `error`");
+            redirect('mahasiswa/profil');
+        }
     }
 
-    $config = [
-        'upload_path'   => $upload_path,
-        'allowed_types' => 'pdf',
-        'max_size'      => 2048,
-        'file_name'     => 'file_' . $nim . '_' . time()
-    ];
+    // === UPLOAD PDF ===
+    $file_pdf = null;
+    if (!empty($_FILES['file_pdf']['name'])) {
+        $config_pdf = [
+            'upload_path'   => $upload_path_pdf,
+            'allowed_types' => 'pdf',
+            'max_size'      => 5120,
+            'file_name'     => 'pdf_' . $nim . '_' . time()
+        ];
+        $this->upload->initialize($config_pdf);
 
-    $this->load->library('upload', $config);
+        if ($this->upload->do_upload('file_pdf')) {
+            $file_pdf = $this->upload->data('file_name');
+        } else {
+            $this->session->set_flashdata('swetalert', "`Gagal Upload PDF`, `" . strip_tags($this->upload->display_errors()) . "`, `error`");
+            redirect('mahasiswa/profil');
+        }
+    }
 
-    if (!$this->upload->do_upload('file_pdf')) {
-        $error = $this->upload->display_errors('', '');
-        $this->session->set_flashdata('swetalert', "`Upsss!`, `$error`, `error`");
-    } else {
-        $upload_data = $this->upload->data();
-        $file_name = $upload_data['file_name'];
+    // === Simpan ke DB jika salah satu berhasil ===
+    $data_update = [];
+    if ($foto) $data_update['foto'] = $foto;
+    if ($file_pdf) $data_update['file_pdf'] = $file_pdf;
 
+    if (!empty($data_update)) {
         $this->db->where('nim', $nim);
-        $this->db->update('mahasiswa', ['file_pdf' => $file_name]);
+        $this->db->update('mahasiswa', $data_update);
 
-        $this->session->set_flashdata('swetalert', '`Good Job!`, `File PDF berhasil diupload`, `success`');
+        $this->session->set_flashdata('swetalert', '`Berhasil!`, `File berhasil diupload`, `success`');
     }
 
     redirect('mahasiswa/profil');
@@ -172,7 +202,6 @@ $upload_path = FCPATH . 'uploads/pdf/';
 		$this->load->view('content/admin/mahasiswa/idcard', $data);
 	}
 
-	//loadMhsRegist
 	public function loadMhsRegist()
 	{
 		$data = [
@@ -185,5 +214,4 @@ $upload_path = FCPATH . 'uploads/pdf/';
 		$this->load->view('content/admin/mahasiswa/registed', $data);
 		$this->load->view('layout/footer');
 	}
-
 }

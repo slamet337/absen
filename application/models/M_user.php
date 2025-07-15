@@ -9,13 +9,19 @@ class M_user extends CI_Model
 		return $query;
 	}
 	// Get User by useername and password
-	public function ceklogin($username, $password){
-		$this->db->where('username', $username);
-		$this->db->where('password', $password);
-		$this->db->from('user');
-		$query = $this->db->get();
-		return $query;
-	}
+	// public function ceklogin($username, $password){
+	// 	$this->db->where('username', $username);
+	// 	$this->db->where('password', $password);
+	// 	$this->db->from('user');
+	// 	$query = $this->db->get();
+	// 	return $query;
+	// }
+	public function ceklogin($username)
+{
+    $this->db->where('username', $username);
+    return $this->db->get('user');
+}
+
 	
 	// Get user
 	public function get($id = ''){

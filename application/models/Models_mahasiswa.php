@@ -66,4 +66,13 @@ class Models_mahasiswa extends CI_Model
 		$query = $this->db->get();
 		return $query;
 	}
+
+	public function getFilteredMahasiswa($role, $id_ruangan = null)
+{
+    if ($role == 2 && $id_ruangan !== null) {
+        $this->db->where('id_ruangan', $id_ruangan);
+    }
+    return $this->db->get('mahasiswa');
+}
+
 }

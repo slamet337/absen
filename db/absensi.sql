@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 12, 2025 at 09:27 AM
+-- Generation Time: Jul 13, 2025 at 01:43 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -34,26 +34,29 @@ CREATE TABLE `mahasiswa` (
   `prodi` varchar(50) DEFAULT NULL,
   `fakultas` varchar(50) DEFAULT NULL,
   `nohp` varchar(15) DEFAULT NULL,
+  `id_ruangan` int(11) NOT NULL,
   `ruangan` varchar(20) DEFAULT NULL,
   `tgl` date DEFAULT NULL,
-  `status` varchar(1) DEFAULT NULL
+  `status` varchar(1) DEFAULT NULL,
+  `wkt_regist` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `file_pdf` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `mahasiswa`
 --
 
-INSERT INTO `mahasiswa` (`nim`, `password`, `nama`, `prodi`, `fakultas`, `nohp`, `ruangan`, `tgl`, `status`) VALUES
-('D10123001', '$2y$10$29D7PrwPunJpSdW.RQvSyui3AE44iX8XNaORf6bFf2N7bNMlyuxya', 'INDAH SEPTIANI HUNOU', 'S1 Ilmu Hukum', 'HUKUM', '', 'GZHZ2', '2023-11-19', '1'),
-('D10123002', '', 'PUPUT ARIANTI KAIMUDIN', 'S1 Ilmu Hukum', 'HUKUM', '', '3', '2023-11-19', '1'),
-('D10123003', '', 'NAFILA HARSYA RAMADHANI', 'S1 Ilmu Hukum', 'HUKUM', '', '3', '0000-00-00', '0'),
-('D10123005', '', 'KOMANG LENI LESTARI', 'S1 Teknik Informatika', 'TEKNIK', '', '3', '2023-11-19', '1'),
-('D10123008', '', 'SAHRUL BARMAWI', 'S1 Ilmu Hukum', 'HUKUM', '', '3', '0000-00-00', '0'),
-('D10123009', '', 'MAGFIRAH NUR RAHMADHANI', 'S1 Ilmu Hukum', 'HUKUM', '', '3', '2023-11-20', '0'),
-('D10123010', '', 'TRIANY MBALOTO', 'S1 Ilmu Hukum', 'HUKUM', '', '3', '0000-00-00', '0'),
-('D10123011', '', 'GHYFARI ARDANA PUTRA TUMU', 'S1 Ilmu Hukum', 'HUKUM', '', '3', '0000-00-00', '0'),
-('F55123006', '', 'CHYNTIA MARGARETHA', 'S1 Teknik Informatika', 'TEKNIK', '', '3', '2023-11-19', '1'),
-('F55123007', '', 'NILUH RISTIANI', 'S1 Ilmu Hukum', 'HUKUM', '', '3', '0000-00-00', '0');
+INSERT INTO `mahasiswa` (`nim`, `password`, `nama`, `prodi`, `fakultas`, `nohp`, `id_ruangan`, `ruangan`, `tgl`, `status`, `wkt_regist`, `file_pdf`) VALUES
+('D10123001', '$2y$10$29D7PrwPunJpSdW.RQvSyui3AE44iX8XNaORf6bFf2N7bNMlyuxya', 'INDAH SEPTIANI HUNOU', 'S1 Ilmu Hukum', 'HUKUM', '', 3, 'GZHZ', '2025-07-13', '0', '2025-07-13 07:26:33', ''),
+('D10123002', '', 'PUPUT ARIANTI KAIMUDIN', 'S1 Ilmu Hukum', 'HUKUM', '', 0, '3', '2023-11-19', '1', '2025-07-13 07:19:33', ''),
+('D10123003', '', 'NAFILA HARSYA RAMADHANI', 'S1 Ilmu Hukum', 'HUKUM', '', 0, '3', '0000-00-00', '0', '2025-07-13 07:19:33', ''),
+('D10123005', '', 'KOMANG LENI LESTARI', 'S1 Teknik Informatika', 'TEKNIK', '', 0, '3', '2023-11-19', '1', '2025-07-13 07:19:33', ''),
+('D10123008', '', 'SAHRUL BARMAWI', 'S1 Ilmu Hukum', 'HUKUM', '', 0, '3', '0000-00-00', '0', '2025-07-13 07:19:33', ''),
+('D10123009', '', 'MAGFIRAH NUR RAHMADHANI', 'S1 Ilmu Hukum', 'HUKUM', '', 0, '3', '2023-11-20', '0', '2025-07-13 07:19:33', ''),
+('D10123010', '', 'TRIANY MBALOTO', 'S1 Ilmu Hukum', 'HUKUM', '', 0, '3', '0000-00-00', '0', '2025-07-13 07:19:33', ''),
+('D10123011', '', 'GHYFARI ARDANA PUTRA TUMU', 'S1 Ilmu Hukum', 'HUKUM', '', 0, '3', '0000-00-00', '0', '2025-07-13 07:19:33', ''),
+('F55123006', '', 'CHYNTIA MARGARETHA', 'S1 Teknik Informatika', 'TEKNIK', '', 0, '3', '2023-11-19', '1', '2025-07-13 07:19:33', ''),
+('F55123007', '', 'NILUH RISTIANI', 'S1 Ilmu Hukum', 'HUKUM', '', 0, '3', '0000-00-00', '0', '2025-07-13 07:19:33', '');
 
 -- --------------------------------------------------------
 
@@ -69,6 +72,7 @@ CREATE TABLE `user` (
   `status` varchar(1) NOT NULL,
   `role` varchar(1) NOT NULL,
   `ruangan` varchar(15) NOT NULL,
+  `id_ruangan` int(11) NOT NULL,
   `created_at` varchar(36) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -76,9 +80,10 @@ CREATE TABLE `user` (
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`iduser`, `username`, `password`, `namauser`, `status`, `role`, `ruangan`, `created_at`) VALUES
-('85fa70fa-a6b9-11ed-bc36-c01850377eb8', 'admin', 'admin', 'Agrhi', '1', '1', '', ''),
-('db051ff2-5e3c-11f0-b92d-68f728843a5b', 'GZHZ', 'memed', 'petugas', '1', '2', 'GZHZ', '');
+INSERT INTO `user` (`iduser`, `username`, `password`, `namauser`, `status`, `role`, `ruangan`, `id_ruangan`, `created_at`) VALUES
+('85fa70fa-a6b9-11ed-bc36-c01850377eb8', 'admin', 'admin', 'Agrhi', '1', '1', '', 0, ''),
+('a4b2f4b0-5fba-11f0-b2cf-68f728843a5b', 'memed', 'memed', 'tempe', '1', '2', 'TUPZ', 1, ''),
+('db051ff2-5e3c-11f0-b92d-68f728843a5b', 'GZHZ', 'memed', 'petugas', '1', '2', 'GZHZ', 3, '');
 
 --
 -- Indexes for dumped tables

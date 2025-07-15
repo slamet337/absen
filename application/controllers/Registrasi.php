@@ -71,13 +71,13 @@ class Registrasi extends CI_Controller
 	public function regist()
 	{
     $nim = htmlspecialchars($this->input->post('nim', true));
+	$role = $this->session->userdata('role');
 
     if (empty($nim)) {
         $this->session->set_flashdata('swetalert', '`Upss!`, `NIM kosong, silakan masukkan atau scan NIM`, `error`');
         redirect('registrasi');
     }
 
-    // Ambil data mahasiswa berdasarkan NIM
     $dataMhs = $this->Models_mahasiswa->getData($nim)->row();
 
     if (!$dataMhs) {
@@ -85,16 +85,19 @@ class Registrasi extends CI_Controller
         redirect('registrasi');
     }
 
-    // Ambil ruangan petugas dari session
-    $ruang_petugas = $this->session->userdata('id_ruangan');
-
-    // Validasi apakah petugas boleh menangani mahasiswa ini
+	if ($role == 'mahasiswa') {
+		if (strpos(strtoupper($dataMhs->ruangan), 'Z') === false) {
+			$this->session->set_flashdata('swetalert', '`Akses Ditolak!`, `Hanya petugas yang dapat melakukan registrasi`, `error`');
+			redirect('registrasi');
+		}	
+	}else{
+	$ruang_petugas = $this->session->userdata('id_ruangan');
     if ($dataMhs->id_ruangan != $ruang_petugas) {
         $this->session->set_flashdata('swetalert', '`Akses Ditolak!`, `Anda tidak berwenang registrasi NIM ini (beda ruangan)`, `error`');
         redirect('registrasi');
-    }
+    	}
+	}
 
-    // Validasi tanggal sesi
     date_default_timezone_set("Asia/Makassar");
     $tglNow = date('Y-m-d');
 
@@ -103,13 +106,11 @@ class Registrasi extends CI_Controller
         redirect('registrasi');
     }
 
-    // Cek apakah sudah registrasi
     if ($dataMhs->status == '1') {
         $this->session->set_flashdata('swetalert', '`Upss!`, `NIM ' . $nim . ' sudah melakukan registrasi`, `error`');
         redirect('registrasi');
     }
 
-    // Lolos semua validasi → Update status
     $dataUpdate = [
         'status'      => '1',
         'wkt_regist'  => date('Y-m-d H:i:s'),

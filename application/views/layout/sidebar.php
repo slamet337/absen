@@ -79,20 +79,57 @@
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="ni ni-single-02 text-success text-sm opacity-10"></i>
                     </div>
-                    <span class="nav-link-text ms-1">Download ID CARD</span>
+                    <span class="nav-link-text ms-1">Profil Mahasiswa</span>
                 </a>
             </li>
 
+            <?php
+                date_default_timezone_set('Asia/Makassar');
+
+                $session = "G1Z1A"; // ambil dari database/user
+                $today = date('d');
+                $now = date('H:i');
+
+                $lastChar = substr($session, -1);
+                $isZoom = strpos($session, 'Z') !== false;
+
+                // mapping kode ke tanggal
+                $kodeTanggal = [
+                    // 'A' => '28',
+                    'A' => '15',
+                    'B' => '29'
+                ];
+
+                // Jam batas waktu tampil
+                // $jamMulai = '08:00';
+                // $jamSelesai = '08:05';
+                $jamMulai = '13:45';
+                $jamSelesai = '13:47';
+
+                $harusTampil = false;
+
+                if ($isZoom && isset($kodeTanggal[$lastChar])) {
+                    if ($today == $kodeTanggal[$lastChar]) {
+                        if ($now >= $jamMulai && $now < $jamSelesai) {
+                            $harusTampil = true;
+                        }
+                    }
+                }
+            ?>
+
+            <!-- tambahkan kondisi -->
+            <?php if ($harusTampil): ?>
             <li class="nav-item">
-                <a class="nav-link <?= ($title === "Kegiatan Saya") ? 'active' : '' ?>"
-                    href="<?= base_url('mahasiswa/kegiatan') ?>">
+                <a class="nav-link <?= ($title === "Registrasi") ? 'active' : '' ?>"
+                    href="<?= base_url('registrasi') ?>">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-calendar-grid-58 text-info text-sm opacity-10"></i>
+                        <i class="ni ni-ruler-pencil text-primary text-sm opacity-10"></i>
                     </div>
-                    <span class="nav-link-text ms-1">Kegiatan Saya</span>
+                    <span class="nav-link-text ms-1">Registrasi</span>
                 </a>
             </li>
+            <?php endif; ?>
             <?php elseif ($role == 2): ?>
             <li class="nav-item">
                 <a class="nav-link <?= ($title === "Registrasi") ? 'active' : '' ?>"

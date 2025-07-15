@@ -35,7 +35,7 @@ class Login extends CI_Controller
                     $this->session->set_userdata([
                         'namauser'   => $user->namauser,
                         'role'       => $user->role,
-                        'id_ruangan' => $user->id_ruangan,     // untuk validasi ruangan
+                        // 'id_ruangan' => $user->id_ruangan,     // untuk validasi ruangan
                         'ruangan'    => $user->ruangan,        // nama ruangan (opsional)
                         'is_login'   => true
                     ]);
@@ -48,31 +48,34 @@ class Login extends CI_Controller
                 $this->session->set_flashdata('swetalert', '`Upsss!`, `Password salah`, `error`');
                 redirect('login');
             }
-        }
-
-        // Cek login sebagai mahasiswa
-         $mhs = $this->Models_mahasiswa->getMahasiswaByNIM($username)->row();
-        if ($mhs) {
-            if (password_verify($password, $mhs->password)) {
-                // Mahasiswa login tanpa cek status
-                $this->session->set_userdata([
-                    'nim'      => $mhs->nim,
-                    'nama'     => $mhs->nama,
-                    'role'     => 'mahasiswa',
-                    'is_login' => true
-                ]);
-                redirect('dashboard');
+        } else {
+            // Cek login sebagai mahasiswa
+            $mhs = $this->Models_mahasiswa->getMahasiswaByNIM($username)->row();
+            if ($mhs) {
+                if (password_verify($password, $mhs->password)) {
+                    // Mahasiswa login tanpa cek status
+                    $this->session->set_userdata([
+                        'nim'      => $mhs->nim,
+                        'nama'     => $mhs->nama,
+                        'ruangan' => $mhs->ruangan,
+                        'role'     => 'mahasiswa',
+                        'is_login' => true
+                    ]);
+                    redirect('dashboard');
+                } else {
+                    $this->session->set_flashdata('swetalert', '`Upsss!`, `Password salah`, `error`');
+                    redirect('login');
+                }
             } else {
-                $this->session->set_flashdata('swetalert', '`Upsss!`, `Password salah`, `error`');
+                // Jika tidak ditemukan di user dan mahasiswa
+                $this->session->set_flashdata('swetalert', '`Upsss!`, `Username tidak ditemukan`, `error`');
                 redirect('login');
             }
         }
-
         // Tidak ditemukan
-        $this->session->set_flashdata('swetalert', '`Upsss!`, `User tidak ditemukan`, `error`');
-        redirect('login');
+        // $this->session->set_flashdata('swetalert', '`Upsss!`, `User tidak ditemukan`, `error`');
+        // redirect('login');
     }
-
     public function logout()
     {
         $this->session->sess_destroy();

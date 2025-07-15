@@ -12,28 +12,12 @@ class Dashboard extends CI_Controller
 		cek_login();
 	}
 
-	// public function index()
-	// {
-	// 	$data = [
-	// 		'title' 		=> 'Dashboard',
-	// 		'mhs' => count($this->Models_mahasiswa->getData()->result()),
-	// 		'registed' => count($this->Models_mahasiswa->getDataMhsRegist()->result()),
-	// 		'unregist' => count($this->Models_mahasiswa->getDataMhsunRegist()->result()),
-	// 	];
-		
-	// 	$this->load->view('layout/header', $data);
-	// 	$this->load->view('layout/sidebar', $data);
-	// 	$this->load->view('layout/navbar');
-	// 	$this->load->view('content/admin/dashboard/index', $data);
-	// 	$this->load->view('layout/footer');
-	// }
-
 	public function index()
 {
     $role = $this->session->userdata('role');
 
-    if ($role == 'admin') {
-        // Tampilan untuk Admin
+    if ($role == '1') {
+        
         $data = [
             'title'     => 'Dashboard Admin',
             'mhs'       => count($this->Models_mahasiswa->getData()->result()),
@@ -70,7 +54,7 @@ class Dashboard extends CI_Controller
             'title' => 'Dashboard Petugas',
             'mhs'       => count($this->Models_mahasiswa->getData()->result()),
             'ruangan' => $this->M_user->cekuser($this->session->userdata('username'))->row()->ruangan ?? 'Tidak Tersedia',
-            'registed'  => count($this->Models_mahasiswa->getDataMhsRegist()->result()),
+            //'registed'  => count($this->Models_mahasiswa->getDataMhsRegist()->result()),
         ];
         $this->load->view('layout/header', $data);
         $this->load->view('layout/sidebar', $data);

@@ -8,8 +8,8 @@ class Management_User extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model('M_user');
-		// cek_login();
-		// check_admin();
+		cek_login();
+		check_admin();
 	}
 
 	// Load Halaman Management User
@@ -149,5 +149,36 @@ class Management_User extends CI_Controller
 			$this->session->set_flashdata('swetalert', '`Good job!`, `Akun Berhasil di Non Aktifkan`, `success`');
 		}
 		redirect('Management_User');
+	}
+
+	// Update password mahasiswa jadi 4 digit terakhir nohp
+	public function hidefunc(){
+		ini_set('max_execution_time', 300); // tambahkan ini agar lebih longgar
+
+        $limit = 100;
+        $offset = 0;
+
+        while (true) {
+            // Ambil 100 data
+            $mahasiswa = $this->db->limit($limit, $offset)->get('mahasiswa')->result();
+
+            if (empty($mahasiswa)) break;
+
+            foreach ($mahasiswa as $mhs) {
+                $nohp = preg_replace('/[^0-9]/', '', $mhs->nohp);
+                $last4 = substr($nohp, -4);
+
+                if (strlen($last4) < 4) continue;
+
+                $hashed_password = password_hash($last4, PASSWORD_BCRYPT);
+
+                $this->db->where('nim', $mhs->nim);
+                $this->db->update('mahasiswa', ['password' => $hashed_password]);
+            }
+
+            $offset += $limit;
+        }
+
+        echo "Update password selesai!";
 	}
 }
