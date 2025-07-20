@@ -9,11 +9,23 @@ class Registrasi extends CI_Controller
 		parent::__construct();
 		$this->load->model('Models_mahasiswa');
 		$this->load->model('M_user');
+		$this->load->helper('akses');
 		cek_login();
 	}
 
 	public function index()
 	{
+		$role = $this->session->userdata('role');
+		$ruangan = $this->session->userdata('ruangan');
+
+		if ($role == 'mahasiswa') {
+			if (!cek_akses_presensi($ruangan)) {
+				redirect('login/blocked');
+				// show_error('Akses ditolak. Halaman registrasi belum tersedia.', 403, 'Forbidden');
+				// return;
+			}
+		}
+
 		$data = [
 			'title' 		=> 'Registrasi',
 		];
@@ -70,61 +82,62 @@ class Registrasi extends CI_Controller
 
 	public function regist()
 	{
-    $nim = htmlspecialchars($this->input->post('nim', true));
-	$role = $this->session->userdata('role');
+		$nim  = htmlspecialchars($this->input->post('nim', true));
+		$role = $this->session->userdata('role');
 
-    if (empty($nim)) {
-        $this->session->set_flashdata('swetalert', '`Upss!`, `NIM kosong, silakan masukkan atau scan NIM`, `error`');
-        redirect('registrasi');
-    }
-
-    $dataMhs = $this->Models_mahasiswa->getData($nim)->row();
-
-    if (!$dataMhs) {
-        $this->session->set_flashdata('swetalert', '`Upss!`, `NIM tidak ditemukan`, `error`');
-        redirect('registrasi');
-    }
-
-	if ($role == 'mahasiswa') {
-		if (strpos(strtoupper($dataMhs->ruangan), 'Z') === false) {
-			$this->session->set_flashdata('swetalert', '`Akses Ditolak!`, `Hanya petugas yang dapat melakukan registrasi`, `error`');
+		if (empty($nim)) {
+			$this->session->set_flashdata('swetalert', '`Upss!`, `NIM kosong, silakan masukkan atau scan NIM`, `error`');
 			redirect('registrasi');
-		}	
-	}else{
-	$ruang_petugas = $this->session->userdata('id_ruangan');
-    if ($dataMhs->id_ruangan != $ruang_petugas) {
-        $this->session->set_flashdata('swetalert', '`Akses Ditolak!`, `Anda tidak berwenang registrasi NIM ini (beda ruangan)`, `error`');
-        redirect('registrasi');
-    	}
+		}
+
+		$dataMhs = $this->Models_mahasiswa->getData($nim)->row();
+
+		if (!$dataMhs) {
+			$this->session->set_flashdata('swetalert', '`Upss!`, `NIM tidak ditemukan`, `error`');
+			redirect('registrasi');
+		}
+
+		// Validasi khusus untuk petugas (role 2)
+		if ($role == '2') {
+			$ruanganPetugas = $this->session->userdata('ruangan');
+
+			if ($ruanganPetugas !== $dataMhs->ruangan) {
+				$this->session->set_flashdata('swetalert', '`Akses Ditolak!`, `Peserta tidak terdaftar di ruangan ' . $ruanganPetugas . '`, `error`');
+				redirect('registrasi');
+			}
+		}
+
+		// Validasi tanggal (hari ini adalah sesi mahasiswa tersebut)
+		date_default_timezone_set("Asia/Makassar");
+		$tanggalHariIni = date('Y-m-d');
+
+		if ($tanggalHariIni != $dataMhs->tgl) {
+			$this->session->set_flashdata('swetalert', '`Upss!`, `NIM ' . $nim . ' tidak dijadwalkan registrasi hari ini`, `error`');
+			redirect('registrasi');
+		}
+
+		// Cek apakah sudah registrasi sebelumnya
+		if ($dataMhs->status == '1') {
+			$this->session->set_flashdata('swetalert', '`Upss!`, `NIM ' . $nim . ' sudah melakukan registrasi`, `error`');
+			redirect('registrasi');
+		}
+
+		// Lanjut update status registrasi
+		$dataUpdate = [
+			'status'     => '1',
+			'wkt_regist' => date('Y-m-d H:i:s'),
+		];
+
+		$this->Models_mahasiswa->updateData($nim, $dataUpdate);
+
+		if ($this->db->affected_rows() > 0) {
+			$this->session->set_flashdata('swetalert', '`Good Job!`, `NIM ' . $nim . ' berhasil registrasi`, `success`');
+		} else {
+			$this->session->set_flashdata('swetalert', '`Upss!`, `Terjadi kesalahan saat registrasi`, `error`');
+		}
+
+		redirect('registrasi');
 	}
 
-    date_default_timezone_set("Asia/Makassar");
-    $tglNow = date('Y-m-d');
-
-    if ($tglNow != $dataMhs->tgl) {
-        $this->session->set_flashdata('swetalert', '`Upss!`, `NIM ' . $nim . ', hari ini bukan sesinya`, `error`');
-        redirect('registrasi');
-    }
-
-    if ($dataMhs->status == '1') {
-        $this->session->set_flashdata('swetalert', '`Upss!`, `NIM ' . $nim . ' sudah melakukan registrasi`, `error`');
-        redirect('registrasi');
-    }
-
-    $dataUpdate = [
-        'status'      => '1',
-        'wkt_regist'  => date('Y-m-d H:i:s'),
-    ];
-
-    $this->Models_mahasiswa->updateData($nim, $dataUpdate);
-
-    if ($this->db->affected_rows() > 0) {
-        $this->session->set_flashdata('swetalert', '`Good Job!`, `NIM ' . $nim . ' berhasil registrasi`, `success`');
-    } else {
-        $this->session->set_flashdata('swetalert', '`Upss!`, `Terjadi kesalahan saat registrasi`, `error`');
-    }
-
-    redirect('registrasi');
-	}
 
 }

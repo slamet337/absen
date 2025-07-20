@@ -1,4 +1,8 @@
-<?php $role = $this->session->userdata('role'); ?>
+<?php 
+    $this->load->helper('akses'); 
+    $ruangan = $this->session->userdata('ruangan');
+    $role = $this->session->userdata('role');
+?>
 
 <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 "
     id="sidenav-main">
@@ -83,42 +87,7 @@
                 </a>
             </li>
 
-            <?php
-                date_default_timezone_set('Asia/Makassar');
-
-                $session = "G1Z1A"; // ambil dari database/user
-                $today = date('d');
-                $now = date('H:i');
-
-                $lastChar = substr($session, -1);
-                $isZoom = strpos($session, 'Z') !== false;
-
-                // mapping kode ke tanggal
-                $kodeTanggal = [
-                    // 'A' => '28',
-                    'A' => '15',
-                    'B' => '29'
-                ];
-
-                // Jam batas waktu tampil
-                // $jamMulai = '08:00';
-                // $jamSelesai = '08:05';
-                $jamMulai = '13:45';
-                $jamSelesai = '13:47';
-
-                $harusTampil = false;
-
-                if ($isZoom && isset($kodeTanggal[$lastChar])) {
-                    if ($today == $kodeTanggal[$lastChar]) {
-                        if ($now >= $jamMulai && $now < $jamSelesai) {
-                            $harusTampil = true;
-                        }
-                    }
-                }
-            ?>
-
-            <!-- tambahkan kondisi -->
-            <?php if ($harusTampil): ?>
+            <?php if (cek_akses_presensi($ruangan)): ?>
             <li class="nav-item">
                 <a class="nav-link <?= ($title === "Registrasi") ? 'active' : '' ?>"
                     href="<?= base_url('registrasi') ?>">
@@ -130,6 +99,7 @@
                 </a>
             </li>
             <?php endif; ?>
+
             <?php elseif ($role == 2): ?>
             <li class="nav-item">
                 <a class="nav-link <?= ($title === "Registrasi") ? 'active' : '' ?>"

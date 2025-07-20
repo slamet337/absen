@@ -9,6 +9,8 @@ class Dashboard extends CI_Controller
 		parent::__construct();
 		$this->load->model('Models_mahasiswa');
         $this->load->model('M_user');
+        // $this->load->model('M_ruangan');
+        $this->load->model('M_kelas');
 		cek_login();
 	}
 
@@ -23,6 +25,8 @@ class Dashboard extends CI_Controller
             'mhs'       => count($this->Models_mahasiswa->getData()->result()),
             'registed'  => count($this->Models_mahasiswa->getDataMhsRegist()->result()),
             'unregist'  => count($this->Models_mahasiswa->getDataMhsunRegist()->result()),
+            // 'ruangan'   => $this->M_ruangan->getData()->result(),
+            'kelas'     => $this->M_kelas->getJumlahMahasiswaPerKelas(),
         ];
 
         $this->load->view('layout/header', $data);

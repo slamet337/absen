@@ -44,28 +44,31 @@
                     } ?>
                 </div>
             </div>
-
-            <a href="<?= base_url('mahasiswa/loadViewIDCard/getByNim/' . $this->session->userdata('nim')) ?>"
-                class="btn btn-primary mt-3" target="_blank">
-                🎫 Cetak ID Card
-            </a>
-        </div>
-        <!-- <hr> -->
-        <div class="card-footer">
-            <h5>Upload Surat Pernyataannya</h5>
+            <h5 class="mt-3">Upload Surat Pernyataannya</h5>
             <div class="form-group">
                 <label for="file_gambar">Silahkan Upload Surat Pernyataannya Anda (.PDF)</label>
                 <input type="file" name="file_pdf" accept="sp/*" class="form-control">
             </div>
             <button type="submit" class="btn btn-primary mt-3">Upload</button>
+            <p>Setelah Upload File Anda dapat melakukan Cetak Id Card dan mendapatkan link Zoom</p>
         </div>
+        <!-- <hr> -->
+        <?php if (!empty($mahasiswa['file_pdf'])):?>
+        <div class="card-footer">
+            <a href="<?= base_url('mahasiswa/loadViewIDCard/getByNim/' . $this->session->userdata('nim')) ?>"
+                class="btn btn-primary mt-3" target="_blank">
+                🎫 Cetak ID Card
+            </a>
 
-        <!-- <div class="form-group mt-2">
-            <label for="file_pdf">
-                <h2>Silahkan Upload Surat Pernyataannya (.PDF)</h2>
-            </label>
-            <input type="file" name="file_pdf" accept=".pdf" class="form-control">
-        </div> -->
+            <a href="https://<?= $mahasiswa['link'] ?>" target="_blank" class="btn btn-secondary mt-3"
+                rel="noopener noreferrer">
+                link ZOOM</a>
+        </div>
+        <?php else:?>
+        <div class="card-footer">
+            <p class="text-danger">Anda belum mengupload surat pernyataan. Silakan upload terlebih dahulu.</p>
+        </div>
+        <?php endif; ?>
     </div>
 </form>
 
