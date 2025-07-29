@@ -27,7 +27,7 @@ class Registrasi extends CI_Controller
 		}
 
 		$data = [
-			'title' 		=> 'Registrasi',
+			'title' 		=> 'Absensi',
 		];
 
 		$this->load->view('layout/header', $data);
